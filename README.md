@@ -1,4 +1,5 @@
 # Pacman
+Controle com as setas do teclado.
 Clique ESPACE para começar e pausar.
 
 ![alt text](https://github.com/abac-axi/pacman-canvas/blob/main/game.png?raw=true)
