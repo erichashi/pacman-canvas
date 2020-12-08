@@ -7,8 +7,9 @@ const rightghost = document.getElementById("right");
 const scaredghost = document.getElementById("scared");
 const scaredghostwhite = document.getElementById("scaredwhite");
 
+//Mapa do jogo é uma matriz. Confira a função drawMaze()
 const maze = [
-    [8,9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,9,9,9],
+    [9,9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,9,9,9],
     [1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1,1,1],
     [1,5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,0,5,1],
     [1,0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0,1,0,1],
@@ -17,7 +18,7 @@ const maze = [
     [1,0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,0,0,1],
     [1,1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,1,1,1],
     [9,9, 1, 0, 0, 1, 9, 9, 9, 1, 0, 0,1,9,9],
-    [9,9, 1, 0, 0, 1, 2, 9, 9, 1, 0, 0,1,9,9],
+    [9,9, 1, 0, 0, 1, 2, 9, 2, 1, 0, 0,1,9,9],
     [1,1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0,1,1,1],
     [0,0, 0, 0, 0, 0, 7, 6, 9, 0, 0, 0,0,0,0],
     [1,1, 1, 0, 1, 0, 9, 9, 9, 0, 1, 0,1,1,1],
@@ -35,6 +36,7 @@ const maze = [
 ];
 
 
+// CUIDADO: alteração desses valores pode resultar em bugs
 const WALLSIZE = 25;
 const BLOCKSHEIGHT = maze.length;
 const BLOCKSWIDTH = maze[0].length;
@@ -43,7 +45,7 @@ const TIMETOBEGINFOLLOW = 500;
 const POWERTIME = 200;
 
 //Pacman is an arc
-const PACSIZE =  WALLSIZE/2 - 1;
+const PACSIZE =  WALLSIZE/2 - 2;
 const PACVEL = 15;
 const PACCOLOR =  '#ffcc00';
 
@@ -52,7 +54,7 @@ const GHOSTSIZE = WALLSIZE ;
 
 
 const NUMPPTS = 4 //getQuantityFromMaze(5);
-const NUMPTS = 159 //getQuantityFromMaze(1);
+const NUMPTS = getQuantityFromMaze(0);
 
 // Set width and heights
 canvas.height = WALLSIZE*BLOCKSHEIGHT;
@@ -60,9 +62,11 @@ canvas.width = WALLSIZE*BLOCKSWIDTH;
 
 
 let pause = true;
+//preventspace em ocasiões onde o player não pode des-pausar
+let preventspace = false;
 
 document.addEventListener('keydown', e =>{
-    if(e.keyCode == 32){
+    if(e.keyCode == 32 && !preventspace){
         pause = !pause;
         update();
     } else {
@@ -235,8 +239,8 @@ function randomCoordinates(){
     let L = randomIntFromRange(0,BLOCKSHEIGHT-1);
     let C = randomIntFromRange(0,BLOCKSWIDTH-1)
     while(maze[L][C] !== 0){
-        L = randomIntFromRange(0,BLOCKSHEIGHT);
-        C = randomIntFromRange(0,BLOCKSWIDTH);
+        L = randomIntFromRange(0,BLOCKSHEIGHT-1);
+        C = randomIntFromRange(0,BLOCKSWIDTH-1);
     }
     return [L, C];
 }
@@ -249,7 +253,7 @@ function Pacman(x, y, radius, vel, gridL, gridC){
     this.radius = radius;
 
     //Norte: 0, Leste: 1, Sul: 3, Oeste: 4
-    //(Reloginho)
+    //(Sentido horário)
     this.facing = 2;
 
     this.vel = {
@@ -269,7 +273,7 @@ function Pacman(x, y, radius, vel, gridL, gridC){
     this.factor1 = 1;
     this.factor2 = 1;
     
-    //Variavel que armazena informações do próximo move
+    //Variável que armazena informações do próximo move
     this.nextmove = {
         velx: vel, 
         vely: 0, 
@@ -283,16 +287,6 @@ function Pacman(x, y, radius, vel, gridL, gridC){
     
     this.prevFacing = this.facing;
 
-
-    // Dadas da variavel, executa movimento
-    this.makemove = (nextmove) => {
-        this.vel.x = nextmove.velx;
-        this.vel.y = nextmove.vely;
-        this.facing = nextmove.fac;
-        this.factor1 = nextmove.fact1;
-        this.factor2 = nextmove.fact2;
-    }
-
     this.update = function(){
         this.draw();
 
@@ -303,7 +297,8 @@ function Pacman(x, y, radius, vel, gridL, gridC){
         }
         this.ttom ++;
 
-        // Só mudar de direção nas coordenadas certas
+        // É necessário mudar de direção nas coordenadas certas. Caso contrário, ele não entra direito nos espaços.
+
         // Os valores de prevX e prevY são somados a cada update. Se esses valores são iguais a vel (que é o size de um murinho, significa que são x e y exatos para mudar de direção)
         if(Math.abs(this.prevX) >= vel || Math.abs(this.prevY) >= vel){
             
@@ -335,10 +330,10 @@ function Pacman(x, y, radius, vel, gridL, gridC){
         this.prevY += this.vel.y/PACVEL; 
 
 
-        //Saída pela portinha esquerda muda os valores de x
+        //Saída pela portinha esquerda
         if ( this.x + this.radius <= 0){
             this.x = canvas.width - this.radius; 
-            this.gridC = BLOCKSWIDTH-1;
+            this.gridC = BLOCKSWIDTH;
         }
         
         //Saída pela portinha direita
@@ -349,7 +344,7 @@ function Pacman(x, y, radius, vel, gridL, gridC){
 
           
         //Checar colisão com muros por meio de coordenadas.
-        //Usando o 'maze', é possível identificar uma colisão somando 1 ou -1 nos valores de Linha e Coluna 
+        //Usando o 'maze', é possível identificar uma colisão somando 1 ou -1 nos valores de Linha (factor1) ou Coluna (factor2) 
 
         //maze[?][1] => colisão direita  
         //maze[?][-1] => colisão esquerda  
@@ -360,34 +355,36 @@ function Pacman(x, y, radius, vel, gridL, gridC){
             this.vel.x = 0;
             this.vel.y = 0;
 
+            this.x = this.gridC * WALLSIZE + this.radius;
+            
+            // TO FIX: pacman não centraliza quando bate no muro. Aumentar o valor de x melhora um pouco.
+            if(this.facing === 2) this.x += 3;
+
+            this.y = this.gridL * WALLSIZE + this.radius;
+            
+            //TO FIX
+            if(this.facing === 3) this.y += 3;
 
             // Update dos valores de prevFacing com o current facing. Isso permite que o player mova o pacman depois de zerados os valores da velocidade 
             this.prevFacing = this.facing;
+
             if(this.nextmove.fac !== this.prevFacing ){
-                switch(this.factor1){
-                    case 1:
-                        this.y -= 2;
-                        break;
-                    case -1:
-                        this.y += 2;
-                        break;
-                }
-    
-                switch(this.factor2){
-                    case 1:
-                        this.x -= 2;
-                        break;
-                    case -1:
-                        this.x += 2;
-                        break;
-                }
                 this.makemove(this.nextmove);
             } 
         }   
     }
 
+    
+    // Dadas da variável, executa movimento
+    this.makemove = (nextmove) => {
+        this.vel.x = nextmove.velx;
+        this.vel.y = nextmove.vely;
+        this.facing = nextmove.fac;
+        this.factor1 = nextmove.fact1;
+        this.factor2 = nextmove.fact2;
+    }
 
-    //Armazena comandos do teclado em uma variavel
+    //Armazena comandos do teclado em uma variável
     this.keyMove = (keyCode) => {
 
         switch(keyCode){
@@ -411,11 +408,6 @@ function Pacman(x, y, radius, vel, gridL, gridC){
                     fact1: 0, 
                     fact2: -1
                 };
-                // this.vel.x = -vel;
-                // this.vel.y = 0;
-                // this.facing = 4;
-                // this.factor1 = 0;
-                // this.factor2 = -1;
                 break;
                 
             case 38:
@@ -537,24 +529,14 @@ function Ghost(x, y, size, vel, images, gridL, gridC){
     this.initialL = gridL;
     this.initialC = gridC;
 
+    // Returning para casa inicial depois de comido
     this.returning = false;
 
+    // Powertime
     this.scared = false;
 
     //this.path é criado no updatePath
     this.path = undefined;
-
-    // Dada novas coordenadas, cria um novo grid e já estabelece um caminho
-    this.updatePath = (goalL, goalC) =>{
-        this.grid = buildVirtualMaze();
-        this.grid[this.gridL][this.gridC] = 'Start';
-        try{   
-            this.grid[goalL][goalC] = 'Goal';
-        } catch (e) {console.log('err')}
-
-        //Cria uma queue/array dos comandos para chegar no goal
-        this.path = findShortestPath([this.gridL, this.gridC], this.grid);
-    }
 
     
     this.update = function(){
@@ -603,6 +585,16 @@ function Ghost(x, y, size, vel, images, gridL, gridC){
         this.y += this.vel.y / this.ttm;
 
         this.draw();
+    }
+
+    // Recebe novas coordenadas, cria um novo grid e estabelece um caminho (path)
+    this.updatePath = (goalL, goalC) =>{
+        this.grid = buildVirtualMaze();
+        this.grid[this.gridL][this.gridC] = 'Start';
+        this.grid[goalL][goalC] = 'Goal';
+
+        //Cria uma queue/array dos comandos para chegar no goal
+        this.path = findShortestPath([this.gridL, this.gridC], this.grid);
     }
 
     // Dado direction, altera valores  
@@ -654,6 +646,8 @@ function Ghost(x, y, size, vel, images, gridL, gridC){
         }
     }
 
+    //Usado (1)quando é comido, (2)quando fica scared e (3)quando sai do scared.
+    //Cria nova rota e centraliza this.x/y no grid
     this.retransform = (goalL, goalC, scared=false, returning=false) => {      
         this.scared = scared;     
         this.returning = returning;
@@ -666,20 +660,22 @@ function Ghost(x, y, size, vel, images, gridL, gridC){
     }
 
     this.draw = () => {
-        ctx.beginPath();
-        //Com powertime: desenha scared ghost
+        //this.scared: desenha scared ghost
         //Sem : desenha this.currentImage
+        ctx.beginPath();
         if(this.scared){
             if(ttpt < POWERTIME/2){
                 //50% of time: normal ghost
-                ctx.drawImage(scaredghost, this.x, this.y, this.size, this.size)
+                ctx.drawImage(scaredghost, this.x + 1, this.y + 1, this.size - 1, this.size - 1)
             } else{
                 //Last 50%: Blinks effect
+                
+                //Comandos para blink
                 this.ttb ++;
                 if(this.ttb > 25){
-                    ctx.drawImage(scaredghost, this.x, this.y, this.size, this.size)
+                    ctx.drawImage(scaredghost, this.x + 1, this.y + 1, this.size - 1, this.size - 1)
                 } else {
-                    ctx.drawImage(scaredghostwhite, this.x, this.y, this.size, this.size)
+                    ctx.drawImage(scaredghostwhite, this.x + 1, this.y + 1, this.size - 1, this.size - 1)
                 }
                 if(this.ttb > 50) this.ttb = 0;
             }
@@ -749,7 +745,7 @@ function PowerPoint(x, y, gridL, gridC){
 
 //Helper functions in updates
 
-function touchGhost(ghost) {
+function touchPacman(ghost) {
 
     if (pacman.y + pacman.radius >= ghost.y &&
         pacman.y - pacman.radius <= ghost.y + ghost.size &&
@@ -779,6 +775,7 @@ function drawMaze() {
     //2: Ghost
     //5: Power Point
     //6: Pacman
+    //7: Texto ('Ready')
     //Resto: blank
 
     maze.forEach((row, rowindex) => {
@@ -793,6 +790,11 @@ function drawMaze() {
         if (cell === 1) {
             walls.push(new Wall(x, y, width, height));
         } else if (cell === 0){
+            //diferenças entre numpts e NUMPTS garante que quando morto, o jogo reinicie com os pontos no mapa salvos.
+
+            //No início da rodada, numpts === NUMPTS
+            //Os pontos vão diminuindo na medida que a array 'points' vai diminuindo
+
             if(numpts <= NUMPTS){
                 points.push(new Point(x, y, rowindex, colindex));
                 numpts++;
@@ -816,8 +818,6 @@ function drawMaze() {
             ))
         } else if (cell === 7){
             text = {x: x+8, y: y-8};
-        } else if (cell === 8){
-            pointtext = {x: x, y: y+WALLSIZE};
         }
 
       });
@@ -826,12 +826,20 @@ function drawMaze() {
 
 // Initialization
 let walls;
+
+
+//diferenças entre numpts e NUMPTS garante que quando morto, o jogo reinicie com os pontos no mapa salvos.
+
+//Os pontos vão diminuindo na medida que a array 'points' vai diminuindo
+//E como drawMaze() só coloca pontos no mapa se numpts <= NUMPTS, o init() não vai dezenhar novos pontos porque numpts é > que NUMPTS
 let points = [];
 let numpts = 0;
-
+// por que noteatedpoints ao invés de points.length? Para o programa ficar mais leve 
+let noteatedpoints = NUMPTS;
 
 let powerpoints = [];
 let numppts = 0;
+let noteatedpowerpoints = NUMPPTS;
 
 
 let pacman;
@@ -841,16 +849,22 @@ let ghosts;
 let ttpt = 0;
 let powertime = false;
 
+
 let score = 0;
 let numlifes = 3;
+//array lifes para desenhar os pacman no canto inferior
 let lifes = [];
 
+//Display do "Ready!" apenas
 let text;
-let pointtext;
 
+//Winround para iniciar a animação do muro piscando
 let winround = false;
+//blinkwalls para armazenar cada ++
 let blinkwalls = 0;
+//total de blinks
 let blinks = 0;
+
 
 //Restart functions
 function restartAfterDie(){
@@ -859,18 +873,20 @@ function restartAfterDie(){
 }
 
 function restartNewRound(){
+    preventspace = true;
     winround = true;
     ghosts = [];    
-    // points = [];
-    // powerpoints = [];
     pacman.draw();
     if(blinks >= 4) {
         pause=true;
+
         points = [];
         numpts = 0;
+        noteatedpoints = NUMPTS;
 
         powerpoints = [];
         numppts = 0;
+        noteatedpowerpoints = NUMPPTS;
 
         init();
         update();
@@ -884,12 +900,13 @@ function restartAll(){
     score = 0;
     points = [];
     numpts = 0;
-  
+    noteatedpoints = NUMPTS;
 
     points = [];
     powerpoints = [];
     numppts = 0;
-   
+    noteatedpowerpoints = NUMPPTS;
+
     init();
     update();    
 }
@@ -908,31 +925,55 @@ function init(){
     blinks = 0;
     blinkwalls = 0;
     
+    preventspace = false;
+
     //mapa GUI
     drawMaze();
 
-    
+    //Desenho de pacman marcando vida
     for(let i = 0; i<numlifes; i++){
         lifes.push(new Pacman(10 + (i*20), canvas.height - 10, PACSIZE - 5, undefined, undefined, undefined))
     }
 
-    ghosts[0].updatePath(2, 1);
-    // ghosts[1].updatePath(11, 1);
+    //Cria coordenadas de 'Goal' iniciais aleatórias
+    ghosts.forEach(ghost => {
+        let x = randomCoordinates();
+        ghost.updatePath(x[0], x[1]);
+    })
 }
 
 function update(){
     ctx.fillStyle = "rgba(0,0,0,1)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    //PAUSADO
+    if(pause){
+        writeTextCanvas('Ready!', text.x, text.y, 'yellow', 18);   
+    }
 
-    if (numppts === 0){
+    //Se completou o mapa
+    if (noteatedpoints + noteatedpowerpoints === 0){
         restartNewRound();
     } else {
         pacman.update();
     }
 
+    //Se powertime: retransform() cada ghost quando acaba
+    if(powertime){
+        ttpt++;
+        if (ttpt >= POWERTIME){
+            powertime = false;
+            ttpt = 0;
+            ghosts.forEach(ghost => {
+                if(!ghost.returning) ghost.retransform(pacman.gridL, pacman.gridC);
+            });
+        };
+    };
 
+
+    //WALLS
     walls.forEach(wall => {
+        //Animação de blinks
         if(winround){
             if(blinkwalls >= 80){
                 wall.draw('white');
@@ -944,37 +985,24 @@ function update(){
         else wall.draw('blue')
     });
 
+    //SCORE
+    writeTextCanvas(score, 0, WALLSIZE, 'yellow', 10);
 
-    writeTextCanvas(score, pointtext.x, pointtext.y, 'yellow', 10);
-
-    if(pause){
-        writeTextCanvas('Ready!', text.x, text.y, 'yellow', 18);   
-    }
-
-
+    //LIFES
     for(let i=0;i<numlifes;i++) lifes[i].draw();
     
-        
-    if(powertime){
-        ttpt++;
-        if (ttpt >= POWERTIME){
-            powertime = false;
-            ttpt = 0;
-            ghosts.forEach(ghost => {
-                if(!ghost.returning) ghost.retransform(pacman.gridL, pacman.gridC);
-            });
-        };
-    };
     
+    //POINTS: se comido, desaparece, incrementa score e diminui noteatedpoints
+    points.forEach((pt, ptindex) => {
+        pt.draw();
+        if (touchPoint(pt)){
+            points.splice(ptindex, 1);
+            noteatedpoints--;
+            score+=10;
+        };
+    })
 
-    // points.forEach((pt, ptindex) => {
-    //     pt.draw();
-    //     if (touchPoint(pt)){
-    //         points.splice(ptindex, 1);
-    //         score+=10;
-    //     };
-    // })
-
+    //POWERPOINTS: powertime=true, retrosform() cada ghost
     powerpoints.forEach((ppt, pptindex) =>{
         ppt.draw();
 
@@ -985,16 +1013,14 @@ function update(){
                 let c = randomCoordinates();
                 ghost.retransform(c[0], c[1], scared=true);
             });
-            numppts--;
+            noteatedpowerpoints--;
             powerpoints.splice(pptindex, 1);
         };
     });
 
-
+    //GHOST: se touchPacman(), volta pra casa OU game over. 
     ghosts.forEach((ghost) => {
-        if(touchGhost(ghost)) pause=true;
-
-        if(touchGhost(ghost) && !ghost.returning){
+        if(touchPacman(ghost) && !ghost.returning){
             if(ghost.scared){
                 pause=true;
 
@@ -1009,12 +1035,13 @@ function update(){
 
             } else {
                 pause = true;
+                preventspace = true;
                 numlifes--;
 
                 setTimeout(() => {
-                    if(numlifes === 0){
+                    if(numlifes <= 0){
                         alert('You loose')
-                        restartAll();
+                        restartAll()
                     } else {
                         restartAfterDie();
                     }
