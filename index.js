@@ -1,5 +1,7 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+const body = document.querySelector('body');
+
 const downghost = document.getElementById("down");
 const upghost = document.getElementById("up");
 const leftghost = document.getElementById("left");
@@ -36,10 +38,19 @@ const maze = [
 ];
 
 
+// Set width and heights
+canvas.height = body.clientHeight/1.345;
+
 // CUIDADO: alteração desses valores pode resultar em bugs
-const WALLSIZE = 25;
 const BLOCKSHEIGHT = maze.length;
 const BLOCKSWIDTH = maze[0].length;
+
+let WALLSIZE = (canvas.height)/BLOCKSHEIGHT;
+
+// canvas.height = WALLSIZE * BLOCKSHEIGHT;
+canvas.width = WALLSIZE * BLOCKSWIDTH;
+
+
 
 const TIMETOBEGINFOLLOW = 500;
 const POWERTIME = 200;
@@ -56,9 +67,6 @@ const GHOSTSIZE = WALLSIZE ;
 const NUMPPTS = 4 //getQuantityFromMaze(5);
 const NUMPTS = getQuantityFromMaze(0);
 
-// Set width and heights
-canvas.height = WALLSIZE*BLOCKSHEIGHT;
-canvas.width = WALLSIZE*BLOCKSWIDTH;
 
 
 let pause = true;
@@ -72,8 +80,15 @@ document.addEventListener('keydown', e =>{
     } else {
         pacman.keyMove(e.keyCode);
     }
-} )
+})
 
+
+document.addEventListener('resize', () => { 
+    canvas.height = body.clientHeight/1.345;
+    WALLSIZE = (canvas.height)/BLOCKSHEIGHT;
+    canvas.width = WALLSIZE * BLOCKSWIDTH;
+    // update();
+})
 
 
 //Generic helpers
@@ -356,14 +371,12 @@ function Pacman(x, y, radius, vel, gridL, gridC){
             this.vel.y = 0;
 
             this.x = this.gridC * WALLSIZE + this.radius;
-            
             // TO FIX: pacman não centraliza quando bate no muro. Aumentar o valor de x melhora um pouco.
-            if(this.facing === 2) this.x += 3;
+            if(this.facing === 2) this.x += Math.floor(WALLSIZE/8.3);
 
             this.y = this.gridL * WALLSIZE + this.radius;
-            
             //TO FIX
-            if(this.facing === 3) this.y += 3;
+            if(this.facing === 3) this.y += Math.floor(WALLSIZE/8.3);
 
             // Update dos valores de prevFacing com o current facing. Isso permite que o player mova o pacman depois de zerados os valores da velocidade 
             this.prevFacing = this.facing;
@@ -666,16 +679,16 @@ function Ghost(x, y, size, vel, images, gridL, gridC){
         if(this.scared){
             if(ttpt < POWERTIME/2){
                 //50% of time: normal ghost
-                ctx.drawImage(scaredghost, this.x + 1, this.y + 1, this.size - 1, this.size - 1)
+                ctx.drawImage(scaredghost, this.x, this.y, this.size, this.size)
             } else{
                 //Last 50%: Blinks effect
                 
                 //Comandos para blink
                 this.ttb ++;
                 if(this.ttb > 25){
-                    ctx.drawImage(scaredghost, this.x + 1, this.y + 1, this.size - 1, this.size - 1)
+                    ctx.drawImage(scaredghost, this.x, this.y, this.size, this.size)
                 } else {
-                    ctx.drawImage(scaredghostwhite, this.x + 1, this.y + 1, this.size - 1, this.size - 1)
+                    ctx.drawImage(scaredghostwhite, this.x, this.y, this.size, this.size)
                 }
                 if(this.ttb > 50) this.ttb = 0;
             }
@@ -795,10 +808,10 @@ function drawMaze() {
             //No início da rodada, numpts === NUMPTS
             //Os pontos vão diminuindo na medida que a array 'points' vai diminuindo
 
-            if(numpts <= NUMPTS){
-                points.push(new Point(x, y, rowindex, colindex));
-                numpts++;
-            }
+            // if(numpts <= NUMPTS){
+            //     points.push(new Point(x, y, rowindex, colindex));
+            //     numpts++;
+            // }
         } else if (cell === 5){
             if(numppts <= NUMPPTS){
                 powerpoints.push(new PowerPoint(x, y, rowindex, colindex));
@@ -817,7 +830,7 @@ function drawMaze() {
                 }, rowindex, colindex
             ))
         } else if (cell === 7){
-            text = {x: x+8, y: y-8};
+            text = {x: x+Math.floor(WALLSIZE/3), y: y-Math.floor(WALLSIZE/3)};
         }
 
       });
@@ -932,7 +945,7 @@ function init(){
 
     //Desenho de pacman marcando vida
     for(let i = 0; i<numlifes; i++){
-        lifes.push(new Pacman(10 + (i*20), canvas.height - 10, PACSIZE - 5, undefined, undefined, undefined))
+        lifes.push(new Pacman(10 + (i*20), canvas.height - (WALLSIZE/2.5), PACSIZE/2, undefined, undefined, undefined))
     }
 
     //Cria coordenadas de 'Goal' iniciais aleatórias
@@ -946,10 +959,6 @@ function update(){
     ctx.fillStyle = "rgba(0,0,0,1)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    //PAUSADO
-    if(pause){
-        writeTextCanvas('Ready!', text.x, text.y, 'yellow', 18);   
-    }
 
     //Se completou o mapa
     if (noteatedpoints + noteatedpowerpoints === 0){
@@ -985,8 +994,14 @@ function update(){
         else wall.draw('blue')
     });
 
+
+    //PAUSADO
+    if(pause){
+        writeTextCanvas('Ready!', text.x, text.y, 'yellow', WALLSIZE/1.4);   
+    }
+
     //SCORE
-    writeTextCanvas(score, 0, WALLSIZE, 'yellow', 10);
+    writeTextCanvas(score, 0, WALLSIZE, 'yellow', WALLSIZE/2.5);
 
     //LIFES
     for(let i=0;i<numlifes;i++) lifes[i].draw();
@@ -1024,7 +1039,7 @@ function update(){
             if(ghost.scared){
                 pause=true;
 
-                writeTextCanvas(200, ghost.x, ghost.y, 'white', 10);
+                writeTextCanvas(200, ghost.x, ghost.y, 'white', WALLSIZE/2.5);
                 score+=200;  
 
                 setTimeout(() => {
@@ -1052,6 +1067,7 @@ function update(){
         ghost.update();    
     });
 
+    
     
     if(!pause){   
         requestAnimationFrame(update);
