@@ -85,12 +85,20 @@ function Pacman(x, y, radius, vel, gridL, gridC){
         if ( this.x + this.radius <= 0){
             this.x = canvas.width - this.radius; 
             this.gridC = BLOCKSWIDTH;
+            ghosts.forEach(ghost => {
+                let x = randomCoordinates();
+                ghost.updatePath(x[0], x[1]);
+            });
         }
         
         //Saída pela portinha direita
         if ( this.x - this.radius >= canvas.width){
             this.x = this.radius;
             this.gridC = -1;
+            ghosts.forEach(ghost => {
+                let x = randomCoordinates();
+                ghost.updatePath(x[0], x[1]);
+            });
         }
 
           

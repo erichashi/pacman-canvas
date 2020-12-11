@@ -70,8 +70,8 @@ const NUMPTS = getQuantityFromMaze(0);
 
 
 let pause = true;
-//preventspace em ocasiões onde o player não pode des-pausar
-let preventspace = false;
+//preventpause em ocasiões onde o player não pode des-pausar
+let preventpause = false;
 
 
 //Generic helpers
@@ -150,10 +150,10 @@ function drawMaze() {
             //No início da rodada, numpts === NUMPTS
             //Os pontos vão diminuindo na medida que a array 'points' vai diminuindo
 
-            if(numpts <= NUMPTS){
-                points.push(new Point(x, y, rowindex, colindex));
-                numpts++;
-            }
+            // if(numpts <= NUMPTS){
+            //     points.push(new Point(x, y, rowindex, colindex));
+            //     numpts++;
+            // }
         } else if (cell === 5){
             if(numppts <= NUMPPTS){
                 powerpoints.push(new PowerPoint(x, y, rowindex, colindex));
@@ -228,7 +228,7 @@ function restartAfterDie(){
 }
 
 function restartNewRound(){
-    preventspace = true;
+    preventpause = true;
     winround = true;
     ghosts = [];    
     pacman.draw();
@@ -279,7 +279,7 @@ function init(){
     blinks = 0;
     blinkwalls = 0;
     
-    preventspace = false;
+    preventpause = false;
 
     //mapa GUI
     drawMaze();
@@ -391,7 +391,7 @@ function update(){
 
             } else {
                 pause = true;
-                preventspace = true;
+                preventpause = true;
                 numlifes--;
 
                 setTimeout(() => {

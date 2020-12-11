@@ -1,5 +1,5 @@
 document.addEventListener('keydown', e =>{
-    if(e.keyCode == 32 && !preventspace){
+    if(e.keyCode == 32 && !preventpause){
         pause = !pause;
         update();
     } else {
@@ -25,8 +25,12 @@ let initialX = null;
 let initialY = null;
 
 function startTouch(e) {
-  initialX = e.touches[0].clientX;
-  initialY = e.touches[0].clientY;
+    initialX = e.touches[0].clientX;
+    initialY = e.touches[0].clientY;
+    if(!preventpause){
+        pause = !pause;
+        update();
+    }
 };
 
 function moveTouch(e) {
@@ -49,10 +53,12 @@ function moveTouch(e) {
         if (diffX > 0) {
             // swiped left
             // console.log("swiped left");
+            pause = false;
             pacman.keyMove(37);
         } else {
             // swiped right
             // console.log("swiped right");
+            pause = false;
             pacman.keyMove(39);
         }  
     } else {
@@ -60,10 +66,12 @@ function moveTouch(e) {
         if (diffY > 0) {
             // swiped up
             // console.log("swiped up");
+            pause = false;
             pacman.keyMove(38);
         } else {
             // swiped down
             // console.log("swiped down");
+            pause = false;
             pacman.keyMove(40);
         }  
     }
