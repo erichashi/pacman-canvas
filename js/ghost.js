@@ -226,9 +226,11 @@ function Ghost(x, y, size, vel, images, gridL, gridC){
         // Se chegou no destino OU ta na hora de trocar o destino
         if (this.grid[this.gridL][this.gridC] === "Goal" || this.ttcp > TIMETOBEGINFOLLOW){
             this.ttcp = 0;
-            this.returning = false;
-
-            if(this.scared) {
+            if(this.returning){
+                this.returning = false;
+                let c = randomCoordinates();
+                this.retransform(c[0], c[1]);
+            } else if(this.scared) {
                 //Valores aleatórios no Powertime
                 let c = randomCoordinates();
                 this.updatePath(c[0], c[1]);

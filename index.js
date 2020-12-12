@@ -150,10 +150,10 @@ function drawMaze() {
             //No início da rodada, numpts === NUMPTS
             //Os pontos vão diminuindo na medida que a array 'points' vai diminuindo
 
-            // if(numpts <= NUMPTS){
-            //     points.push(new Point(x, y, rowindex, colindex));
-            //     numpts++;
-            // }
+            if(numpts <= NUMPTS){
+                points.push(new Point(x, y, rowindex, colindex));
+                numpts++;
+            }
         } else if (cell === 5){
             if(numppts <= NUMPPTS){
                 powerpoints.push(new PowerPoint(x, y, rowindex, colindex));
@@ -302,7 +302,7 @@ function update(){
 
 
     //Se completou o mapa
-    if (noteatedpoints + noteatedpowerpoints === 0){
+    if (noteatedpowerpoints === 0){
         restartNewRound();
     } else {
         pacman.update();

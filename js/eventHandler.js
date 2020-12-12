@@ -25,7 +25,7 @@ let initialX = null;
 let initialY = null;
 
 function startTouch(e) {
-    if(e.touches.lenght === 2 && !preventpause){
+    if(e.touches.length === 2 && !preventpause){
         pause = !pause;
         update();
     }
@@ -52,26 +52,18 @@ function moveTouch(e) {
         // sliding horizontally
         if (diffX > 0) {
             // swiped left
-            // console.log("swiped left");
-            pause = false;
             pacman.keyMove(37);
         } else {
             // swiped right
-            // console.log("swiped right");
-            pause = false;
             pacman.keyMove(39);
         }  
     } else {
         // sliding vertically
         if (diffY > 0) {
             // swiped up
-            // console.log("swiped up");
-            pause = false;
             pacman.keyMove(38);
         } else {
             // swiped down
-            // console.log("swiped down");
-            pause = false;
             pacman.keyMove(40);
         }  
     }
