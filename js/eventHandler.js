@@ -25,12 +25,12 @@ let initialX = null;
 let initialY = null;
 
 function startTouch(e) {
-    initialX = e.touches[0].clientX;
-    initialY = e.touches[0].clientY;
-    if(!preventpause){
+    if(e.touches.lenght === 2 && !preventpause){
         pause = !pause;
         update();
     }
+    initialX = e.touches[0].clientX;
+    initialY = e.touches[0].clientY;
 };
 
 function moveTouch(e) {

@@ -286,7 +286,7 @@ function init(){
 
     //Desenho de pacman marcando vida
     for(let i = 0; i<numlifes; i++){
-        lifes.push(new Pacman(10 + (i*20), canvas.height - (WALLSIZE/2.5), PACSIZE/2, undefined, undefined, undefined))
+        lifes.push(new Pacman(Math.floor(WALLSIZE/2.5) + (i*20), canvas.height - Math.floor(WALLSIZE/2.5), PACSIZE/2, undefined, undefined, undefined))
     }
 
     //Cria coordenadas de 'Goal' iniciais aleatórias
