@@ -2,63 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0', shrink-to-fit=no">">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0', shrink-to-fit=no">
     <title>Pacman</title>
 
-    <link rel="icon" type="image/png" href="/img/down.png"/>
-
-
-    <style>
-
-        body{
-            margin: 0;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: black;
-            overscroll-behavior: contain;
-            touch-action: manipulation;
-        }
-    
-        div {
-    
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            margin-top: 10%;
-        }
-    
-        .hidden {
-            display: none;
-        }
-    </style>    
-        
+    <link rel="icon" type="image/png" href="assets/img/ghost/down.png"/>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <div>
-        <h1>hello</h1>
-        <canvas id="canvas"> </canvas>
-    </div>
+    <main>
+
+        <div class="text-container">
+            <p id="scoretext" style="margin: 0; font-size: small;"></p>
+            <p style="margin: 0; font-size: small;">Recorde: <span id="recordtext"></span></p>
+        </div>
+
+        <div style="position: absolute; left: 50%; top: 31%;">
+            <div style="position: relative; left: -50%;">
+                <p class="center-text-container"></p>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div style="display: flex;">    
+            <div class="life-container"></div>
+        </div>
+
+        <div style="margin-top: 3%;">
+            <button class="btn" onclick="start()">Start</button>
+        </div>
+    </main>
 </body>
-</html>
 
 
 
-<img class='hidden' src="img/down.png" id="down" alt="">
-<img class='hidden' src="img/up.png" id="up" alt="">
-<img class='hidden' src="img/left.png" id="left" alt="">
-<img class='hidden' src="img/right.png" id="right" alt="">
+<script src="src/Pacman.js"></script>
+<script src="src/Ghost.js"></script>
+<script src="src/Points.js"></script>
 
-<img class='hidden' src="img/scared.png" id="scared" alt="">
-<img class='hidden' src="img/scaredwhite.png" id="scaredwhite" alt="">
+<script src="src/utils.js"></script>
+<script src="src/EventHandlers.js"></script>
+
+<script src="src/StateMachine.js"></script>
+<script src="src/states/BaseState.js"></script>
+<script src="src/states/GameOverState.js"></script>
+<script src="src/states/PlayState.js"></script>
+<script src="src/states/RestartNewRoundState.js"></script>
+<script src="src/states/RestartAfterDieState.js"></script>
+<script src="src/states/TitleState.js"></script>
+<script src="src/states/KillGhostState.js"></script>
+<script src="src/states/KillPacmanState.js"></script>
+
+<script src="src/states/ghost/GhostFollowingState.js"></script>
+<script src="src/states/ghost/GhostScaredState.js"></script>
+<script src="src/states/ghost/GhostReturningState.js"></script>
 
 
-
-<script src="js/pacman.js"></script>
-<script src="js/ghost.js"></script>
-<script src="js/eventHandler.js"></script>
-<script src="js/walls.js"></script>
-<script src="js/points.js"></script>
-<script src="index.js"></script>
+<script src="src/Constants.js"></script>
+<script src="main.js"></script>
 

@@ -1,0 +1,64 @@
+p, button{
+    font-family: sans-serif;
+    font-size: revert;
+    color: white;
+    text-transform: uppercase;
+}
+
+body{
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overscroll-behavior: contain;
+    touch-action: manipulation;
+    overflow: hidden;
+}
+
+main{
+    width: 95%;
+    display: inline-block;
+    text-align: center;
+}
+
+.text-container {
+    font-size: large;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* .canvas-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+} */
+
+
+.btn {
+    border: none;
+    font-size: inherit;
+    cursor: pointer;
+    padding: 1% 2%;
+    letter-spacing: 1px;
+    font-weight: 700;
+    background: blue;
+    color: white;
+}
+
+
+
+.center-text-container{
+    text-align: center;
+    padding: 6% 0%;
+    font-weight: 800;
+}
+
+@media(min-width: 800px){
+    main{
+        width: 60%;
+        max-width: 520px;
+    }
+}

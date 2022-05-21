@@ -1,9 +1,9 @@
 ﻿# Pacman
-Controle com as setas do teclado. 
-Clique SPACE ou clique de dois dedos para começar e pausar.
+## A web-based Pacman game built with JavaScript and HTML5 Canvas tag   
+You can play at [Bandcode](http://bandcode.colband.net.br/), the programming club @ [Colband](http://colband.net.br/) 
 
-![alt text](https://github.com/abac-axi/pacman-canvas/blob/main/game.png?raw=true)
+### Play
+- PC: use the arrow keys
+- Mobile: slide your finger 
 
-### TODO:
-- pequeno bug de posicionamento quando pacman bate no muro 
-- tela de gameover
+![alt text](https://github.com/erichashi/pacman-canvas/blob/main/thumb.png?raw=true)

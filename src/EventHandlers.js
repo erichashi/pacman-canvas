@@ -1,39 +1,28 @@
+function wasPressed(key){
+    return keysPressed[key];
+}
+
 document.addEventListener('keydown', e =>{
-    if(e.keyCode == 32 && !preventpause){
+    if(e.keyCode === 32 && e.ctrlKey){
         pause = !pause;
         update();
-    } else {
-        pacman.keyMove(e.keyCode);
-    }
-})
+    } 
 
-document.addEventListener('resize', () => { 
-    canvas.height = body.clientHeight/1.345;
-    WALLSIZE = (canvas.height)/BLOCKSHEIGHT;
-    canvas.width = WALLSIZE * BLOCKSWIDTH;
-    // update();
+    keysPressed[e.code] = true;
+
 })
 
 
-https://stackoverflow.com/questions/53192433/how-to-detect-swipe-in-javascript
-
-document.addEventListener("touchstart", startTouch, false);
-document.addEventListener("touchmove", moveTouch, false);
-
-// Swipe Up / Down / Left / Right
+//https://stackoverflow.com/questions/53192433/how-to-detect-swipe-in-javascript
 let initialX = null;
 let initialY = null;
 
-function startTouch(e) {
-    if(e.touches.length === 2 && !preventpause){
-        pause = !pause;
-        update();
-    }
+document.addEventListener("touchstart", e => {
     initialX = e.touches[0].clientX;
     initialY = e.touches[0].clientY;
-};
+}, false);
 
-function moveTouch(e) {
+document.addEventListener("touchmove", e => {
     if (initialX === null) {
         return;
     }
@@ -52,19 +41,19 @@ function moveTouch(e) {
         // sliding horizontally
         if (diffX > 0) {
             // swiped left
-            pacman.keyMove(37);
+            keysPressed['ArrowLeft'] = true;
         } else {
             // swiped right
-            pacman.keyMove(39);
+            keysPressed['ArrowRight'] = true;
         }  
     } else {
         // sliding vertically
         if (diffY > 0) {
             // swiped up
-            pacman.keyMove(38);
+            keysPressed['ArrowUp'] = true;
         } else {
             // swiped down
-            pacman.keyMove(40);
+            keysPressed['ArrowDown'] = true;
         }  
     }
 
@@ -72,4 +61,4 @@ function moveTouch(e) {
     initialY = null;
 
     e.preventDefault();
-};
+}, false);
